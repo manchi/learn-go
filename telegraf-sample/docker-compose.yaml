@@ -1,0 +1,32 @@
+# start: docker-compose up
+# tear down: docker-compose down
+version: "3"
+services:
+  server:
+    build:
+      context: .
+    ports:
+      - "8010:8010"
+  influxdb:
+    image: influxdb
+    ports:
+      - "8083:8083"
+      - "8086:8086"
+      - "8090:8090"
+    # volumes:
+    #   - "/path/you/define:/var/lib/influxdb"
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    links:
+      - influxdb
+    volumes:
+      - ./conf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - server
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    # volumes:
+    #   - "/path/you/define:/var/lib/grafana"
